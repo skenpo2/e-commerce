@@ -10,8 +10,12 @@ const cookieParser = require('cookie-parser');
 // routes import
 const productRoutes = require('./routes/product.routes');
 const cartRoutes = require('./routes/cart.routes');
+const orderRoutes = require('./routes/order.routes');
+const reviewRoutes = require('./routes/review.routes');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
 
-const errorHandler = require('./middlewares/erroHandler');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 const PORT = 5000;
@@ -32,8 +36,12 @@ app.use((req, res, next) => {
 });
 
 // routes
+app.use('/auth', authRoutes);
+app.use('/user', userRoutes);
 app.use('/product', productRoutes);
 app.use('/cart', cartRoutes);
+app.use('/order', orderRoutes);
+app.use('/product/review', reviewRoutes);
 
 app.use(errorHandler);
 

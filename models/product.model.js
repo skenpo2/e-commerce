@@ -56,30 +56,14 @@ const ProductSchema = new mongoose.Schema(
         required: [true, 'Image URL is required'],
       },
     },
-
-    ratings: {
-      total: {
-        type: Number,
-        default: 0,
-        min: [0, 'Total rating cannot be negative'],
-      },
-      count: {
-        type: Number,
-        default: 0,
-        min: [0, 'Review count cannot be negative'],
-      },
-    },
-    numReviews: {
-      type: Number,
-      default: 0,
-      min: [0, 'Number of reviews cannot be negative'],
-    },
     discount: {
       type: Number,
       default: 0,
       min: [0, 'Discount cannot be negative'],
       max: [100, 'Discount cannot exceed 100%'],
     },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+
     isFeatured: {
       type: Boolean,
       default: false,

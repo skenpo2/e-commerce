@@ -1,3 +1,4 @@
+const paypal = require('../utils/paypal');
 const Order = require('../models/order.model');
 const logger = require('../utils/logger');
 const customError = require('../utils/customError');
@@ -26,9 +27,10 @@ const createOrder = async (req, res) => {
       payment_method: 'paypal',
     },
     redirect_urls: {
-      return_url: '',
-      cancel_url: '',
+      return_url: 'http://localhost:5000/paypal/success',
+      cancel_url: 'http://localhost:5000/paypal/cancel',
     },
+
     transactions: [
       {
         item_list: {
@@ -51,7 +53,7 @@ const createOrder = async (req, res) => {
 
   paypal.payment.create(create_payment_json, async (error, paymentInfo) => {
     if (error) {
-      logger.warn(`An error Occur: ${error}`);
+      console.log(error.stack);
 
       return res.status(500).json({
         success: false,
@@ -89,37 +91,55 @@ const createOrder = async (req, res) => {
 const capturePayment = async (req, res) => {
   const { paymentId, payerId, orderId } = req.body;
 
-  let order = await Order.findById(orderId);
-
-  if (!order) {
-    customError('404', 'Order can not be found');
+  if (!paymentId || !payerId) {
+    return customError(400, 'Missing paymentId or payerId');
   }
 
-  order.paymentStatus = 'paid';
-  order.orderStatus = 'confirmed';
-  order.paymentId = paymentId;
-  order.payerId = payerId;
-
-  for (let item of order.cartItems) {
-    let product = await Product.findById(item.productId);
-
-    if (!product) {
-      customError(`404", "Not enough stock for this product ${product.name}`);
+  // Retrieve payment from PayPal before executing
+  paypal.payment.get(paymentId, function (error, payment) {
+    if (error) {
+      console.error('PayPal Payment Retrieval Error:', error.response);
+      return customError(500, 'Payment not found on PayPal');
     }
 
-    product.stock -= item.quantity;
-    await product.save();
-  }
+    if (payment.state !== 'approved') {
+      return customError(400, 'Payment not approved by user');
+    }
 
-  const getCartId = order.cartId;
-  await Cart.findByIdAndDelete(getCartId);
+    // Execute PayPal payment before updating the order
+    paypal.payment.execute(
+      paymentId,
+      { payer_id: payerId },
+      async (error, payment) => {
+        if (error) {
+          console.error('PayPal Execution Error:', error.response);
+          return customError(
+            500,
+            `Payment verification failed: ${
+              error.response.message || 'Unknown error'
+            }`
+          );
+        }
 
-  await order.save();
+        let order = await Order.findById(orderId);
+        if (!order) {
+          return customError(404, 'Order not found');
+        }
 
-  res.status(200).json({
-    success: true,
-    message: 'order confirmed',
-    data: order,
+        order.paymentStatus = 'paid';
+        order.orderStatus = 'confirmed';
+        order.paymentId = paymentId;
+        order.payerId = payerId;
+
+        await order.save();
+
+        res.status(200).json({
+          success: true,
+          message: 'Order confirmed',
+          data: order,
+        });
+      }
+    );
   });
 };
 

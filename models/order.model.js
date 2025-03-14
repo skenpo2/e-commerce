@@ -13,7 +13,6 @@ const OrderSchema = new mongoose.Schema({
     },
   ],
   addressInfo: {
-    addressId: String,
     address: String,
     city: String,
     phone: String,
