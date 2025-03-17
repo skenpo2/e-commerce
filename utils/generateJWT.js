@@ -19,7 +19,7 @@ const generateRefreshToken = (user) => {
         id: user._id,
       },
     },
-    process.env.ACCESS_TOKEN,
+    process.env.REFRESH_TOKEN,
     { expiresIn: '7d' }
   );
 };

@@ -1,3 +1,4 @@
+const { FaLessThanEqual } = require('react-icons/fa');
 const Product = require('../models/product.model');
 const cloudinary = require('cloudinary').v2;
 const customError = require('../utils/customError');
@@ -45,7 +46,7 @@ const addProduct = async (req, res) => {
   });
 };
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res, next) => {
   let {
     category,
     brand,
@@ -65,11 +66,9 @@ const getAllProducts = async (req, res) => {
     filter.category = { $in: category.split(',') };
   }
 
-  // Filtering by brands
-
+  // Filtering by multiple brands
   if (brand) {
     filter.brand = { $in: brand.split(',') };
-    console.log(filter.brand);
   }
 
   // Filtering by price range
@@ -79,12 +78,16 @@ const getAllProducts = async (req, res) => {
     if (priceMax) filter.price.$lte = Number(priceMax);
   }
 
-  // search by product name
+  // Search using MongoDB text index for better efficiency
   if (search) {
-    filter.name = { $regex: search, $options: 'i' };
+    filter.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { category: { $regex: search, $options: 'i' } },
+      { brand: { $regex: search, $options: 'i' } },
+    ];
   }
 
-  //  Sorting logic
+  // Sorting logic
   let sortOptions = {};
   if (sortBy) {
     sortOptions[sortBy] = order === 'desc' ? -1 : 1;
@@ -95,14 +98,18 @@ const getAllProducts = async (req, res) => {
   page = Number(page) || 1; // Default page = 1
   let skip = (page - 1) * limit;
 
-  //  Execute query
+  // Execute query
   const products = await Product.find(filter)
     .sort(sortOptions) // Sorting
     .limit(limit) // Pagination limit
     .skip(skip); // Pagination skip
 
-  if (!products) {
-    customError('404', 'No Product available');
+  // Handle empty results
+  if (products.length === 0) {
+    return res.status(200).json({
+      success: false,
+      message: 'No products found',
+    });
   }
 
   res.status(200).json(products);
@@ -114,7 +121,10 @@ const getSingleProduct = async (req, res) => {
   const singleProduct = await Product.findOne({ slug });
 
   if (!singleProduct) {
-    return customError('404', 'Product Not found');
+    return res.status(404).json({
+      success: false,
+      message: 'Product not found',
+    });
   }
 
   res.status(200).json({ success: true, product: singleProduct });
@@ -134,8 +144,6 @@ const editProduct = async (req, res) => {
     isFeatured,
   } = req.body;
 
-  console.log({ isFeatured });
-
   const product = await Product.findOneAndUpdate(
     { slug },
     {
@@ -153,25 +161,11 @@ const editProduct = async (req, res) => {
   );
 
   if (!product) {
-    customError('404', 'product does not exist');
+    return res.status(404).json({
+      success: true,
+      message: 'Product not found',
+    });
   }
-
-  //   product.name = name || product.name;
-  //   product.description = description || product.name;
-  //   product.price = price || product.price;
-  //   product.category = category || product.category;
-  //   product.brand = brand || product.brand;
-  //   product.stock = stock || product.stock;
-  //   product.image = image || product.image;
-  //   product.discount = discount || product.discount;
-
-  //   if (isFeatured) {
-  //     product.isFeatured = isFeatured || product.isFeatured;
-  //   }
-
-  //   console.log(product.isFeatured);
-
-  //   const updatedProduct = await product.save();
 
   res.status(201).json({ success: true, data: product });
 };
@@ -182,7 +176,10 @@ const deleteProduct = async (req, res) => {
   const product = await Product.findOneAndDelete({ slug });
 
   if (!product) {
-    customError('404', 'product does not exist');
+    return res.status(404).json({
+      success: true,
+      message: 'Product not found',
+    });
   }
   res
     .status(200)

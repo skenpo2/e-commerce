@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const verifyJWT = require('../middlewares/verifyJWT');
 
 const {
   addToCart,
@@ -9,15 +10,15 @@ const {
 } = require('../controllers/cart.controller');
 
 // Get user's cart items
-router.get('/:userId', fetchCartItems);
+router.get('/:userId', verifyJWT, fetchCartItems);
 
 // Add an item to the cart
-router.post('/:userId', addToCart);
+router.post('/', verifyJWT, addToCart);
 
 // Update a cart item
-router.put('/:userId/:productId', updateCartItems);
+router.put('/', verifyJWT, updateCartItems);
 
 // Remove an item from the cart
-router.delete('/:userId/:productId', deleteCartItems);
+router.delete('/:productId', verifyJWT, deleteCartItems);
 
 module.exports = router;

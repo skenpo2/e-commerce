@@ -6,20 +6,35 @@ const Product = require('../models/product.model');
 const Cart = require('../models/cart.model');
 
 const createOrder = async (req, res) => {
-  const {
+  const userId = req.user.id;
+  const { cartId, addressInfo, paymentMethod, cartItems, totalAmount } =
+    req.body;
+
+  console.log(userId);
+  const canSave = [
     userId,
     cartId,
     cartItems,
     addressInfo,
-    orderStatus,
     paymentMethod,
-    paymentStatus,
     totalAmount,
-    orderDate,
-    orderUpdateDate,
-    paymentId,
-    payerId,
-  } = req.body;
+  ].every(Boolean);
+
+  if (!canSave) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide all required details',
+    });
+  }
+  console.log(
+    userId,
+    cartId,
+    cartItems,
+    addressInfo,
+    paymentMethod,
+    totalAmount
+  );
+  const cart = await Cart.findById(cartId);
 
   const create_payment_json = {
     intent: 'sale',
@@ -65,16 +80,15 @@ const createOrder = async (req, res) => {
         cartId,
         cartItems,
         addressInfo,
-        orderStatus,
         paymentMethod,
-        paymentStatus,
         totalAmount,
-        orderDate,
-        orderUpdateDate,
-        paymentId,
-        payerId,
+        orderStatus: 'pending',
+        paymentStatus: 'pending',
+        orderDate: new Date(),
+        orderUpdateDate: new Date(),
+        paymentId: '',
+        payerId: '',
       });
-
       await newOrder.save();
       const approvalURL = paymentInfo.links.find(
         (link) => link.rel === 'approval_url'
@@ -91,56 +105,87 @@ const createOrder = async (req, res) => {
 const capturePayment = async (req, res) => {
   const { paymentId, payerId, orderId } = req.body;
 
-  if (!paymentId || !payerId) {
-    return customError(400, 'Missing paymentId or payerId');
+  if (!paymentId || !payerId || !orderId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing paymentId, payerId, or orderId',
+    });
   }
 
-  // Retrieve payment from PayPal before executing
-  paypal.payment.get(paymentId, function (error, payment) {
-    if (error) {
-      console.error('PayPal Payment Retrieval Error:', error.response);
-      return customError(500, 'Payment not found on PayPal');
-    }
+  let order = await Order.findById(orderId);
+  if (!order) {
+    return res
+      .status(404)
+      .json({ success: false, message: 'Order does not exist' });
+  }
 
-    if (payment.state !== 'approved') {
-      return customError(400, 'Payment not approved by user');
-    }
+  order.paymentStatus = 'paid';
+  order.orderStatus = 'confirmed';
+  order.paymentId = paymentId;
+  order.payerId = payerId;
+  await order.save();
 
-    // Execute PayPal payment before updating the order
-    paypal.payment.execute(
-      paymentId,
-      { payer_id: payerId },
-      async (error, payment) => {
-        if (error) {
-          console.error('PayPal Execution Error:', error.response);
-          return customError(
-            500,
-            `Payment verification failed: ${
-              error.response.message || 'Unknown error'
-            }`
-          );
-        }
-
-        let order = await Order.findById(orderId);
-        if (!order) {
-          return customError(404, 'Order not found');
-        }
-
-        order.paymentStatus = 'paid';
-        order.orderStatus = 'confirmed';
-        order.paymentId = paymentId;
-        order.payerId = payerId;
-
-        await order.save();
-
-        res.status(200).json({
-          success: true,
-          message: 'Order confirmed',
-          data: order,
-        });
-      }
-    );
+  res.status(200).json({
+    success: true,
+    message: 'payment updated',
+    data: order,
   });
+  // Retrieve PayPal payment
+  // paypal.payment.get(paymentId, function (error, payment) {
+  //   if (error) {
+  //     console.error('PayPal Payment Retrieval Error:', error.response);
+  //     return res
+  //       .status(500)
+  //       .json({ success: false, message: 'Payment not found on PayPal' });
+  //   }
+
+  //   console.log('PayPal Payment State:', payment.state);
+  //   if (payment.state !== 'created') {
+  //     return res
+  //       .status(400)
+  //       .json({ success: false, message: 'Payment not ready for execution' });
+  //   }
+
+  //   // Execute PayPal payment
+  //   paypal.payment.execute(
+  //     paymentId,
+  //     { payer_id: payerId },
+  //     async (error, payment) => {
+  //       if (error) {
+  //         console.error('PayPal Execution Error:', error.response);
+  //         return res.status(500).json({
+  //           success: false,
+  //           message: `Payment verification failed: ${
+  //             error.response.message || 'Unknown error'
+  //           }`,
+  //         });
+  //       }
+
+  //       // Ensure payment was completed
+  //       if (
+  //         !payment.transactions[0].related_resources[0].sale ||
+  //         payment.transactions[0].related_resources[0].sale.state !==
+  //           'completed'
+  //       ) {
+  //         return res.status(400).json({
+  //           success: false,
+  //           message: 'Payment not completed on PayPal',
+  //         });
+  //       }
+
+  //       // Update order
+  //       order.paymentStatus = 'paid';
+  //       order.orderStatus = 'confirmed';
+  //       order.paymentId = paymentId;
+  //       order.payerId = payerId;
+  //       await order.save();
+
+  //       res
+  //         .status(200)
+  //         .json({ success: true, message: 'Order confirmed', data: order });
+  //     }
+  //   );
+  // });
 };
 
 const getAllOrderByUser = async (req, res) => {

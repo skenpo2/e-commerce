@@ -1,5 +1,4 @@
 const { validateRegistration, validateLogin } = require('../utils/validator');
-const customError = require('../utils/customError');
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 
@@ -84,4 +83,58 @@ const loginUser = async (req, res) => {
     });
 };
 
-module.exports = { registerUser, loginUser };
+const refresh = (req, res) => {
+  const cookies = req.cookies;
+
+  if (!cookies?.jwt) {
+    res.status(400).json({
+      success: false,
+      message: 'unauthorized',
+    });
+  }
+
+  const refreshToken = cookies.jwt;
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN, async (err, decoded) => {
+    if (err) {
+      return res.status(403).json({
+        success: false,
+        message: ' Forbidden',
+      });
+    }
+    const isUser = await User.findById(decoded.user.id);
+
+    if (!isUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized',
+      });
+    }
+    const accessToken = generateAccessToken(isUser);
+    res.status(200).json({
+      success: true,
+      token: accessToken,
+    });
+  });
+};
+
+// logout
+
+const logout = async (req, res) => {
+  const cookies = req.cookies;
+
+  if (!cookies?.jwt) {
+    res.status(400).json({
+      success: false,
+      message: 'No cookie found',
+    });
+  }
+
+  res.clearCookie('jwt', { httpOnly: true, sameSite: 'None' });
+  res.json({
+    success: true,
+    message: ' logged out successfully',
+  });
+};
+
+module.exports = { registerUser, loginUser, refresh, logout };

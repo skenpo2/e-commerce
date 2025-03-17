@@ -5,7 +5,6 @@ const ProductSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      unique: [true, 'Product name must be unique'],
       required: [true, 'Product name is required'],
       trim: true,
       minlength: [3, 'Product name must be at least 3 characters long'],
@@ -13,7 +12,6 @@ const ProductSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      unique: true,
       lowercase: true,
     },
     description: {
@@ -31,11 +29,7 @@ const ProductSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, 'Category is required'],
-      enum: {
-        values: ['Electronics', 'Fashion', 'Home', 'Beauty', 'Sports', 'Other'],
-        message:
-          'Category must be one of Electronics, Fashion, Home, Beauty, Sports, or Other',
-      },
+      enum: ['electronics', 'fashion', 'home', 'beauty', 'sports', 'other'],
     },
     brand: {
       type: String,
@@ -63,7 +57,6 @@ const ProductSchema = new mongoose.Schema(
       max: [100, 'Discount cannot exceed 100%'],
     },
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
-
     isFeatured: {
       type: Boolean,
       default: false,
@@ -72,15 +65,32 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Generate slug before saving
+//  Generate slug before saving (for new products)
 ProductSchema.pre('save', function (next) {
-  if (this.isModified('name') && this.name) {
+  if (this.isModified('name')) {
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
   next();
 });
 
-// Add indexes for optimized queries
-ProductSchema.index({ name: 'text', category: 1, brand: 1 });
+//  Update slug when the name is changed using `findOneAndUpdate`
+ProductSchema.pre('findOneAndUpdate', async function (next) {
+  const update = this.getUpdate();
+  if (update.name) {
+    update.slug = slugify(update.name, { lower: true, strict: true });
+    this.setUpdate(update);
+  }
+  next();
+});
+
+//  Indexing for search
+ProductSchema.index({ name: 'text', category: 'text', brand: 'text' });
+
+//  Indexing for filtering & sorting
+ProductSchema.index({ category: 1, brand: 1, price: -1 });
+
+// Enforcing uniqueness on name and slug
+ProductSchema.index({ name: 1 }, { unique: true });
+ProductSchema.index({ slug: 1 }, { unique: true });
 
 module.exports = mongoose.model('Product', ProductSchema);

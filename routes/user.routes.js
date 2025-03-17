@@ -7,7 +7,7 @@ routes.post('/address');
 routes.put('/address');
 routes.get('/address');
 routes.put('/');
-routes.get('/', verifyJWT, getAllUsers);
+routes.get('/');
 routes.delete('/');
 
 module.exports = routes;
