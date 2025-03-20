@@ -3,6 +3,7 @@ require('express-async-errors');
 const express = require('express');
 const mongoose = require('mongoose');
 const logger = require('./utils/logger');
+const swagger = require('./swagger');
 const connectDB = require('./databases/connectDB');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -22,6 +23,8 @@ const PORT = 5000;
 const DatabaseUrl = process.env.MONGO_URI;
 
 connectDB(DatabaseUrl);
+
+swagger(app);
 
 // middleware
 app.use(helmet());

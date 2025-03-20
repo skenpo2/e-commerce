@@ -49,6 +49,7 @@ const ProductSchema = new mongoose.Schema(
         type: String,
         required: [true, 'Image URL is required'],
       },
+      publicId: String,
     },
     discount: {
       type: Number,

@@ -2199,3 +2199,72 @@
 {"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-18T18:44:18.275Z"}
 {"API":"E-Commerce","level":"info","message":"Received a DELETE request  to /user","timestamp":"2025-03-18T18:44:36.375Z"}
 {"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-18T18:44:36.376Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:20:45.504Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:20:45.511Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:20:55.389Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:20:55.395Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:21:24.205Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:21:24.210Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:21:39.729Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:21:39.739Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:22:14.915Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:22:14.920Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:22:30.531Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:22:30.537Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:22:46.828Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:22:46.835Z"}
+{"API":"E-Commerce","level":"info","message":"Received a GET request  to /auth/refresh-token","timestamp":"2025-03-19T08:25:28.463Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:26:58.082Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:26:58.087Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:27:04.711Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:27:04.717Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:31:37.456Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:31:37.463Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:31:52.248Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:31:52.255Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:33:32.063Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:33:32.075Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:33:46.462Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:33:46.470Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:34:07.246Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:34:07.251Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T08:41:12.346Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T08:41:12.355Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T09:00:51.316Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T09:00:51.322Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /auth/login","timestamp":"2025-03-19T09:01:00.110Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:01:00.110Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /product/upload-image","timestamp":"2025-03-19T09:03:05.927Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:03:05.928Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /product/upload-image","timestamp":"2025-03-19T09:03:21.449Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:03:21.450Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T09:12:43.970Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T09:12:43.975Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /product/add","timestamp":"2025-03-19T09:13:23.999Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:13:24.000Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /product/add","timestamp":"2025-03-19T09:13:34.443Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:13:34.444Z"}
+{"API":"E-Commerce","level":"info","message":"Received a POST request  to /product/add","timestamp":"2025-03-19T09:13:56.159Z"}
+{"API":"E-Commerce","level":"info","message":"Request body,  [object Object] ","timestamp":"2025-03-19T09:13:56.160Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T10:04:17.939Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T10:04:17.946Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T10:04:30.536Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T10:04:30.542Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T10:04:55.836Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T10:04:55.843Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T10:54:43.248Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T10:54:43.261Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T10:54:55.868Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T10:54:55.884Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T22:32:11.398Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T22:32:11.404Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-19T22:56:32.016Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-19T22:56:32.023Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-20T16:31:55.963Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-20T16:31:55.977Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-20T16:32:05.290Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-20T16:32:05.301Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-20T16:58:32.895Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-20T16:58:32.912Z"}
+{"API":"E-Commerce","level":"info","message":"MongoDB is connected","timestamp":"2025-03-20T16:58:41.454Z"}
+{"API":"E-Commerce","level":"info","message":"App is running on 5000","timestamp":"2025-03-20T16:58:41.476Z"}
