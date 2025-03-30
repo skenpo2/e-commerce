@@ -1,13 +1,19 @@
+//import joi validation helper functions
 const { validateRegistration, validateLogin } = require('../utils/validator');
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 
+// import JWT generator helpers
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require('../utils/generateJWT');
 
+// @desc   register a user
+// @route  POST /api/auth/register
+// @access Public
 const registerUser = async (req, res) => {
+  // valid user entries
   const { error } = validateRegistration(req.body);
   if (error) {
     return res.status(400).json({
@@ -36,7 +42,11 @@ const registerUser = async (req, res) => {
   });
 };
 
+// @desc   login a registered user and send JWT
+// @route  POST /api/auth/login
+// @access Public
 const loginUser = async (req, res) => {
+  // valid user entries
   const { error } = validateLogin(req.body);
 
   if (error) {
@@ -55,7 +65,7 @@ const loginUser = async (req, res) => {
       message: 'User does not exist',
     });
   }
-
+  // verifyPassword is a a custom mongoose method to verify user password
   const isValidPassword = await isUser.verifyPassword(password);
 
   if (!isValidPassword) {
@@ -64,7 +74,7 @@ const loginUser = async (req, res) => {
       message: 'Incorrect Credentials',
     });
   }
-
+  // generate access and refresh token for isUser
   const accessToken = generateAccessToken(isUser);
 
   const refreshToken = generateRefreshToken(isUser);
@@ -83,11 +93,14 @@ const loginUser = async (req, res) => {
     });
 };
 
+// @desc   refresh token
+// @route  GET /api/auth/refresh
+// @access Private
 const refresh = async (req, res) => {
   const cookies = req.cookies;
 
   if (!cookies?.jwt) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: 'unauthorized',
     });
@@ -118,13 +131,15 @@ const refresh = async (req, res) => {
   });
 };
 
-// logout
+// @desc   register a user
+// @route  POST /api/auth/logout
+// @access Public
 
 const logout = async (req, res) => {
   const cookies = req.cookies;
 
   if (!cookies?.jwt) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: 'No cookie found',
     });
