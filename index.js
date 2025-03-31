@@ -35,12 +35,12 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/product', productRoutes);
-app.use('/cart', cartRoutes);
-app.use('/order', orderRoutes);
-app.use('/review', reviewRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/product', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/order', orderRoutes);
+app.use('/api/review', reviewRoutes);
 
 // Handle 404 Errors (Page Not Found)
 app.use((req, res, next) => {
