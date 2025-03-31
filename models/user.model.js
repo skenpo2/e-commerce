@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Cart = require('../models/cart.model');
 
 const userSchema = new mongoose.Schema(
   {
@@ -40,6 +41,19 @@ userSchema.pre('save', async function (next) {
     }
   }
   next();
+});
+
+// Middleware to delete user's cart when they are deleted
+userSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const user = await this.model.findOne(this.getFilter());
+    if (user) {
+      await Cart.deleteMany({ userId: user._id });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 userSchema.methods.verifyPassword = async function (candidatePassword) {

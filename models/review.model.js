@@ -13,7 +13,7 @@ const ProductReviewSchema = new mongoose.Schema(
       required: true,
     },
     reviewMessage: { type: String, required: true },
-    reviewValue: { type: Number, required: true, min: 1, max: 5 }, // Ensuring rating stays within 1-5
+    reviewValue: { type: Number, required: true, min: 1, max: 5 },
   },
   { timestamps: true }
 );

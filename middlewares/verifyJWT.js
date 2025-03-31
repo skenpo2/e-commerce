@@ -17,7 +17,10 @@ const verifyJWT = (req, res, next) => {
   // Verify the JWT
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ message: 'Forbidden' }); // Invalid token
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden',
+      }); // Invalid token
     }
 
     // Attach the decoded user ID to the request for authorization

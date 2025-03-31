@@ -2,6 +2,10 @@ const Review = require('../models/review.model');
 const Product = require('../models/product.model');
 const Order = require('../models/order.model');
 
+// @desc   add review to a product
+// @route  POST  /api/review
+// @access Private (only logged user who have purchased the product)
+
 const addReview = async (req, res) => {
   const userId = req.user.id;
   const { productId, reviewMessage, reviewValue } = req.body;
@@ -20,7 +24,7 @@ const addReview = async (req, res) => {
   const order = await Order.findOne({
     userId,
     'cartItems.productId': productId,
-    paymentStatus: 'paid', // Ensure order is paid
+    paymentStatus: 'paid',
   });
 
   if (!order) {
@@ -56,6 +60,9 @@ const addReview = async (req, res) => {
   });
 };
 
+// @desc   get a product reviews
+// @route  POST  /api/review/productId
+// @access Public
 const getProductReviews = async (req, res) => {
   const { productId } = req.params;
 
@@ -74,6 +81,9 @@ const getProductReviews = async (req, res) => {
   });
 };
 
+// @desc   delete a review
+// @route  DELETE  /api/review
+// @access Private (only logged user who posted the  review)
 const deleteReview = async (req, res) => {
   const userId = req.user.id;
   const { reviewId } = req.body;

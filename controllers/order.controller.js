@@ -1,10 +1,12 @@
 const paypal = require('../utils/paypal');
 const Order = require('../models/order.model');
 const logger = require('../utils/logger');
-const customError = require('../utils/customError');
 const Product = require('../models/product.model');
 const Cart = require('../models/cart.model');
 
+// @desc   create an order
+// @route  POST  /api/order/create
+// @access Private (logged user Only)
 const createOrder = async (req, res) => {
   const userId = req.user.id;
   const { cartId, addressInfo, paymentMethod, cartItems, totalAmount } =
@@ -26,16 +28,15 @@ const createOrder = async (req, res) => {
       message: 'Please provide all required details',
     });
   }
-  console.log(
-    userId,
-    cartId,
-    cartItems,
-    addressInfo,
-    paymentMethod,
-    totalAmount
-  );
   const cart = await Cart.findById(cartId);
+  if (!cart) {
+    return res.status(404).json({
+      success: false,
+      message: 'invalid cart',
+    });
+  }
 
+  // paypal payment initiation
   const create_payment_json = {
     intent: 'sale',
     payer: {
@@ -84,8 +85,6 @@ const createOrder = async (req, res) => {
         totalAmount,
         orderStatus: 'pending',
         paymentStatus: 'pending',
-        orderDate: new Date(),
-        orderUpdateDate: new Date(),
         paymentId: '',
         payerId: '',
       });
@@ -102,6 +101,9 @@ const createOrder = async (req, res) => {
   });
 };
 
+// @desc   capture payment of an order
+// @route  POST  /api/order/payment
+// @access Private (logged user Only)
 const capturePayment = async (req, res) => {
   const { paymentId, payerId, orderId } = req.body;
 
@@ -188,13 +190,26 @@ const capturePayment = async (req, res) => {
   // });
 };
 
+// @desc   get a user order
+// @route  GET  /api/order/user/:userId
+// @access Private (logged user Only)
 const getAllOrderByUser = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.params.userId;
 
-  const orders = Order.find({ userId });
+  if (req.user?.role !== 'admin' && req.user?.id !== userId) {
+    return res.status(403).json({
+      success: false,
+      message: 'Not allowed',
+    });
+  }
 
-  if (!orders.length) {
-    customError('404', 'No order found');
+  const orders = await Order.find({ userId });
+
+  if (orders.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: 'No orders found',
+    });
   }
 
   res.status(200).json({
@@ -203,13 +218,19 @@ const getAllOrderByUser = async (req, res) => {
   });
 };
 
+// @desc   get the details of an order
+// @route  GET  /api/order//:orderId'
+// @access Private (logged user Only)
 const getOrderDetails = async (req, res) => {
   const { orderId } = req.params;
 
   const order = await Order.findById(orderId);
 
   if (!order) {
-    customError('404', 'Order not found');
+    return res.status(404).json({
+      success: false,
+      message: 'order not found',
+    });
   }
 
   res.status(200).json({
@@ -218,13 +239,18 @@ const getOrderDetails = async (req, res) => {
   });
 };
 
-//  @Admin only
+// @desc   get all orders
+// @route  GET  /api/order/
+// @access Private (Admin Only)
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   const orders = await Order.find({});
 
   if (!orders.length) {
-    customError('404', 'No order found');
+    return res.status(404).json({
+      success: false,
+      message: 'No order found',
+    });
   }
 
   res.status(200).json({
@@ -233,16 +259,21 @@ const getAllOrdersOfAllUsers = async (req, res) => {
   });
 };
 
-// @Admin only
+// @desc   update the status of an order
+// @route  PUT  /api/order//:orderId
+// @access Private (Admin Only)
 
 const UpdateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
+  const orderId = req.params.orderId;
   const { orderStatus } = req.body;
 
   const order = await Order.findById(orderId);
 
   if (!order) {
-    customError('404', 'Order not found');
+    return res.status(404).json({
+      success: false,
+      message: 'Order not found',
+    });
   }
 
   await Order.findByIdAndUpdate(orderId, { orderStatus });
@@ -250,6 +281,7 @@ const UpdateOrderStatus = async (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Order status updated successfully',
+    data: order,
   });
 };
 

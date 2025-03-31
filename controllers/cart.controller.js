@@ -1,6 +1,9 @@
 const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
 
+// @desc   Add a product to cart
+// @route  POST  /api/cart
+// @access Private (only logged user)
 const addToCart = async (req, res) => {
   const userId = req.user.id;
   const { productId, quantity } = req.body;
@@ -41,6 +44,9 @@ const addToCart = async (req, res) => {
   res.status(201).json({ success: true, data: cart });
 };
 
+// @desc   Update a cartItem
+// @route  PUT  /api/cart
+// @access Private (only logged user)
 const updateCartItems = async (req, res) => {
   const userId = req.user.id;
   const { productId, quantity } = req.body;
@@ -104,6 +110,10 @@ const updateCartItems = async (req, res) => {
     data: { ...cart._doc, cartItems: formattedProducts },
   });
 };
+
+// @desc   get user cart
+// @route  GET  /api/cart/:userId
+// @access Private (only logged user)
 const fetchCartItems = async (req, res) => {
   const { userId } = req.params;
 
@@ -150,50 +160,63 @@ const fetchCartItems = async (req, res) => {
   });
 };
 
-const deleteCartItems = async (req, res) => {
-  const productId = req.params;
+// @desc   delete an item from  user cart
+// @route  DELETE  /api/cart/:productId
+// @access Private (only logged user)
+const deleteCartItem = async (req, res) => {
+  const productId = req.params.productId;
   const userId = req.user.id;
-
-  const cart = await Cart.findOne({ userId }).populate({
-    path: 'cartItems.productId',
-    select: 'name image description  price',
-  });
-
-  if (!cart) {
+  if (!userId || !productId) {
     return res.status(400).json({
       success: false,
-      message: 'cart not found',
+      message: 'Invalid data provided!',
     });
   }
 
-  cart.cartItems = cart.cartItems.filter((item) => {
-    item.productId._id.toString() !== productId;
+  const cart = await Cart.findOne({ userId }).populate({
+    path: 'cartItems.productId',
+    select: 'name image description price',
   });
+
+  if (!cart) {
+    return res.status(404).json({
+      success: false,
+      message: 'Cart not found!',
+    });
+  }
+
+  // filter out the productId from the cartItems array
+  cart.cartItems = cart.cartItems.filter(
+    (item) => item.productId._id.toString() !== productId
+  );
 
   await cart.save();
 
   await cart.populate({
     path: 'cartItems.productId',
-    select: 'name image description  price',
+    select: 'name image description price',
   });
 
-  const formattedProducts = cart.cartItems.map((item) => ({
-    productId: item.productId ? item.productId._id : null,
-    name: item.productId ? item.productId.name : 'Product not found',
-    image: item.productId ? item.productId.image : null,
-    price: item.productId ? item.productId.price : null,
-    description: item.productId ? item.productId.description : null,
+  const populateCartItems = cart.cartItems.map((item) => ({
+    productId: item.productId?._id || null,
+    name: item.productId?.name || 'Product not found',
+    image: item.productId?.image || null,
+    price: item.productId?.price || null,
+    description: item.productId?.description || null,
     quantity: item.quantity,
   }));
 
   res.status(200).json({
     success: true,
-    data: { ...cart._doc, cartItems: formattedProducts },
+    data: {
+      ...cart._doc,
+      cartItems: populateCartItems,
+    },
   });
 };
 module.exports = {
   addToCart,
   fetchCartItems,
   updateCartItems,
-  deleteCartItems,
+  deleteCartItem,
 };

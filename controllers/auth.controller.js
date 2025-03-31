@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
   await newUser.save();
   res.status(201).json({
     success: true,
-    data: newUser,
+    message: 'Registered successfully, kindly login',
   });
 };
 
@@ -79,6 +79,7 @@ const loginUser = async (req, res) => {
 
   const refreshToken = generateRefreshToken(isUser);
 
+  isUser.password = '';
   res
     .status(200)
     .cookie('jwt', refreshToken, {

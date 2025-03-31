@@ -25,8 +25,8 @@ router.post(
   upload.single('my_file'),
   imageUpload
 );
-router.post('/add', verifyJWT, verifyRole, addProduct);
-router.put('/edit/:slug', verifyJWT, verifyRole, editProduct);
-router.delete('/delete/:slug', verifyJWT, verifyRole, deleteProduct);
+router.post('/', verifyJWT, verifyRole, addProduct);
+router.put('/:slug', verifyJWT, verifyRole, editProduct);
+router.delete('/:slug', verifyJWT, verifyRole, deleteProduct);
 
 module.exports = router;

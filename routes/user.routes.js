@@ -9,9 +9,7 @@ const {
 } = require('../controllers/user.controller');
 const verifyRole = require('../middlewares/verifyRole');
 
-// @Public access
-
-router.get('/:userId', getUser);
+router.get('/:userId', verifyJWT, getUser);
 
 //  @user access
 router.delete('/', verifyJWT, deleteUser);

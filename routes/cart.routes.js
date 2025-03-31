@@ -6,7 +6,7 @@ const {
   addToCart,
   fetchCartItems,
   updateCartItems,
-  deleteCartItems,
+  deleteCartItem,
 } = require('../controllers/cart.controller');
 
 // Get user's cart items
@@ -19,6 +19,6 @@ router.post('/', verifyJWT, addToCart);
 router.put('/', verifyJWT, updateCartItems);
 
 // Remove an item from the cart
-router.delete('/:productId', verifyJWT, deleteCartItems);
+router.delete('/:productId', verifyJWT, deleteCartItem);
 
 module.exports = router;

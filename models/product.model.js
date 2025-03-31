@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const { deleteImage } = require('../utils/cloudinary');
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -74,6 +75,23 @@ ProductSchema.pre('save', function (next) {
   next();
 });
 
+// Middleware to delete associated Reviews and cloudinary image when a product is deleted
+ProductSchema.pre('findOneAndDelete', async function (next) {
+  const product = await this.model.findOne(this.getFilter());
+  if (product) {
+    // Delete associated reviews
+    await mongoose
+      .model('Review')
+      .deleteMany({ productId: { $in: product.reviews } });
+
+    // Delete image from Cloudinary
+    if (product.image?.publicId) {
+      await deleteImage(product.image.publicId);
+    }
+  }
+  next();
+});
+
 //  Update slug when the name is changed using `findOneAndUpdate`
 ProductSchema.pre('findOneAndUpdate', async function (next) {
   const update = this.getUpdate();
@@ -94,4 +112,6 @@ ProductSchema.index({ category: 1, brand: 1, price: -1 });
 ProductSchema.index({ name: 1 }, { unique: true });
 ProductSchema.index({ slug: 1 }, { unique: true });
 
-module.exports = mongoose.model('Product', ProductSchema);
+const Product = mongoose.model('Product', ProductSchema);
+
+module.exports = Product;

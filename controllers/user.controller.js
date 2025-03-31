@@ -1,10 +1,15 @@
 const User = require('../models/user.model');
+// import joi validation helper function
 const { validateEditedUser } = require('../utils/validator');
 
+// @desc   get a user
+// @route  PUT  /api/user/
+// @access Private (user can only edit his or her own details)
 const updateUser = async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.id; //obtain userId from JWT
   const { email, password, name } = req.body;
 
+  //validate user entries
   const { error } = validateEditedUser(req.body);
   if (error) {
     return res.status(400).json({
@@ -26,17 +31,26 @@ const updateUser = async (req, res) => {
   if (password) user.password = password;
 
   await user.save();
-
+  user.password = '';
   res.status(200).json({
     success: true,
     data: user,
   });
 };
 
+// @desc   Delete a user
+// @route  DELETE /api/user
+// @access Private (only the logged user and an admin can delete)
 const deleteUser = async (req, res) => {
-  const user = req.user;
-  const userId = req.body.userId;
-  const password = req.body.password;
+  const user = req.user; //get the logged user from JWT
+  const { password, userId } = req.body;
+
+  if (!userId) {
+    return res.status(404).json({
+      success: false,
+      message: 'userId is required',
+    });
+  }
 
   const isUser = await User.findById(userId);
   if (!isUser) {
@@ -45,9 +59,14 @@ const deleteUser = async (req, res) => {
       message: 'User does not exist',
     });
   }
-
-  // Admin can delete without a password, users must verify their own password
+  if (user.role !== 'admin' && user.id !== userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'A user can only his or her their account',
+    });
+  }
   if (user.role !== 'admin') {
+    // Admin can delete without a password, users must verify their own password
     const isValidPassword = password
       ? await isUser.verifyPassword(password)
       : null;
@@ -59,7 +78,7 @@ const deleteUser = async (req, res) => {
     }
   }
 
-  await User.findByIdAndDelete(userId);
+  await User.findOneAndDelete({ _id: userId });
 
   res.status(200).json({
     success: true,
@@ -67,12 +86,21 @@ const deleteUser = async (req, res) => {
   });
 };
 
+// @desc   get a user
+// @route  GET  /api/user/:userId
+// @access Private( a user can only get his or her info; admin can get any user info)
 const getUser = async (req, res) => {
   const userId = req.params.userId;
+  const { id, role } = req.user; // get user info from JWT
 
-  console.log(userId);
+  if (role !== 'admin' && userId !== id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Only the user or Admin can get user info',
+    });
+  }
 
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select('-password');
 
   if (!user) {
     return res.status(404).json({
@@ -87,11 +115,14 @@ const getUser = async (req, res) => {
   });
 };
 
+// @desc   get all users
+// @route  GET  /api/user
+// @access Private (Admin Only)
 const getAllUsers = async (req, res) => {
-  const users = await User.find({});
+  const users = await User.find({}).select('-password');
 
   if (!users?.length) {
-    res.status(404).json({
+    return res.status(404).json({
       success: true,
       message: 'No user found',
     });
